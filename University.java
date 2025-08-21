@@ -2,9 +2,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/* =========================
-   Core Abstractions & Models
-   ========================= */
+
 
 // Abstraction + Encapsulation
 abstract class Person {
@@ -31,7 +29,6 @@ abstract class Person {
     // Dynamic polymorphism (overridden by subclasses)
     public abstract String getRole();
 
-    // Dynamic polymorphism: nice printable card
     @Override
     public String toString() {
         return String.format("[%s] ID=%d, Name=%s, Email=%s",
@@ -51,7 +48,6 @@ class Student extends Person {
     @Override
     public String getRole() { return "Student"; }
 
-    // Encapsulated accessors
     public Map<LocalDate, Boolean> getAttendance() { return attendance; }
     public Map<String, Integer> getMarksBySubject() { return marksBySubject; }
     public List<Payment> getPayments() { return payments; }
@@ -118,21 +114,19 @@ class Payment {
     }
 }
 
-/* =========================
-   Interfaces (Modular Managers)
-   ========================= */
+
 
 interface AttendanceManager {
-    // Static polymorphism (overloading) + Interface design
-    void markAttendance(Person person, boolean present); // for today
-    void markAttendance(Person person, LocalDate date, boolean present); // for a specific date
+
+    void markAttendance(Person person, boolean present); 
+    void markAttendance(Person person, LocalDate date, boolean present); 
     Map<LocalDate, Boolean> viewAttendance(Person person);
 }
 
 interface ExamManager {
     void addExam(ExaminationDetail exam);
     List<ExaminationDetail> viewExamSchedule();
-    void enterMarks(Student student, String subject, int marks); // enter/update marks
+    void enterMarks(Student student, String subject, int marks);
     Map<String, Integer> viewMarks(Student student);
 }
 
@@ -141,9 +135,7 @@ interface FeeManager {
     List<Payment> viewPayments(Student student);
 }
 
-/* =========================
-   Implementations
-   ========================= */
+
 
 class SimpleAttendanceManager implements AttendanceManager {
     @Override
@@ -216,9 +208,7 @@ class SimpleFeeManager implements FeeManager {
     }
 }
 
-/* =========================
-   University Aggregate (Composition + Services)
-   ========================= */
+
 
 class University {
     private final String name;
@@ -238,7 +228,7 @@ class University {
 
     public String getName() { return name; }
 
-    /* ===== Registration (Static polymorphism via overloading) ===== */
+
 
     // Overload 1: Register student with both name & email
     public Student registerStudent(String name, String email) {
@@ -258,9 +248,9 @@ class University {
         return t;
     }
 
-    /* ===== Updates (Static polymorphism via overloading) ===== */
 
-    // Update student
+
+
     public boolean updateStudent(int id, String newName) {
         Student s = students.get(id);
         if (s == null) return false;
@@ -275,7 +265,7 @@ class University {
         return true;
     }
 
-    // Update teacher (name only)
+
     public boolean updateTeacher(int id, String newName) {
         Teacher t = teachers.get(id);
         if (t == null) return false;
@@ -283,7 +273,7 @@ class University {
         return true;
     }
 
-    // Update teacher (name + email)
+ 
     public boolean updateTeacher(int id, String newName, String newEmail) {
         Teacher t = teachers.get(id);
         if (t == null) return false;
@@ -292,7 +282,6 @@ class University {
         return true;
     }
 
-    // Update teacher (name + email + department)
     public boolean updateTeacher(int id, String newName, String newEmail, String newDept) {
         Teacher t = teachers.get(id);
         if (t == null) return false;
@@ -302,14 +291,13 @@ class University {
         return true;
     }
 
-    /* ===== Find & Lists ===== */
+  
 
     public Student findStudent(int id) { return students.get(id); }
     public Teacher findTeacher(int id) { return teachers.get(id); }
     public List<Student> listStudents() { return new ArrayList<>(students.values()); }
     public List<Teacher> listTeachers() { return new ArrayList<>(teachers.values()); }
 
-    /* ===== Delegated Features ===== */
 
     public void markAttendance(Person p, boolean present) { attendanceManager.markAttendance(p, present); }
     public void markAttendance(Person p, LocalDate date, boolean present) { attendanceManager.markAttendance(p, date, present); }
@@ -323,10 +311,9 @@ class University {
     public void registerPayment(Student s, double amount) { feeManager.registerPayment(s, amount); }
     public List<Payment> viewPayments(Student s) { return feeManager.viewPayments(s); }
 
-    /* ===== Polymorphic utility (Dynamic) ===== */
 
     public void printPersonCard(Person p) {
-        // dynamic dispatch: p.getRole(), p.toString()
+       
         System.out.println("---- Person Card ----");
         System.out.println(p.toString());
         if (p instanceof Teacher) {
